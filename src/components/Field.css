@@ -1,0 +1,41 @@
+.field {
+  margin-top: 10px;
+  padding: 5px;
+}
+
+.fieldHeader {
+  padding: 0 !important;
+  margin: 0 !important;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.info {
+  margin-top: 10px;
+}
+
+.collapseButton {
+  border: 0px;
+  padding: 0;
+  background-color: inherit;
+  border-radius: inherit;
+}
+
+.infoHeader {
+  align-items: center !important;
+  justify-content: space-between !important;
+  display: flex;
+}
+
+.infoContent {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.infoButton {
+  justify-content: center;
+  align-items: center;
+  margin-left: 5px;
+}

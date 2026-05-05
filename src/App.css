@@ -1,38 +1,73 @@
-.App {
+.appContainer {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.pdfContainer {
+  flex-grow: 1;
+  position: relative;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.sideBar {
+  z-index: 100;
+  padding: 5px 10px !important;
+  margin: 0 !important;
+  display: flex;
+  width: fit-content;
+  flex-direction: column;
+  background-color: azure;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.fieldsContainer {
+  overflow-y: auto !important;
+  margin: 5px 0px 0px 0px !important;
+  flex-shrink: 1;
+}
+
+.fieldHeader {
+  display: flex;
+  flex-direction: row;
+}
+
+.zoomButtonContainer {
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.zoomButton {
+  margin: 10px;
+  border-radius: 100%;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.result {
+  width: 500px;
+  min-height: 100px !important;
+  max-height: 200px !important;
+  overflow-y: auto;
+  text-align: start;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
