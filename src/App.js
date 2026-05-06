@@ -40,6 +40,7 @@ export default function App() {
   const [sql, setSql] = useState("");
   const [tolerance, setTolerance] = useState(10);
   const [isHidden, setIsHidden] = useState(false);
+  const [tipoQuery, setTipoQuery] = useState("INSERT");
   let toastInstance = null;
 
   function createFields(columns) {
@@ -127,7 +128,51 @@ export default function App() {
     }
   }
 
-  function generateSql() {
+  function generateUpdate() {
+    let where = Array.from({ length: commonLength }, () => []);
+    let set = Array.from({ length: commonLength }, () => []);
+
+    fields.forEach((field, fieldIndex) => {
+      const nome = field.nome.trim().length > 0 ? field.nome.trim() : "NULL";
+      const dados = [...field.dados];
+      dados.length = commonLength;
+
+      dados.forEach((dado, index) => {
+        const valor =
+          dado === undefined || dado === null || dado.trim().length === 0
+            ? "NULL"
+            : field.isNumerico
+              ? Number(dado.replace(",", "."))
+              : "'" + String(dado).replace(/'/g, "''") + "'";
+        if (field.isCondicao) {
+          where[index].push(nome + "=" + valor);
+        } else {
+          set[index].push(nome + "=" + valor);
+        }
+      });
+    });
+
+    let sql = [];
+    for (let i = 0; i < commonLength; i++) {
+      let query = [];
+      query.push("UPDATE");
+      query.push(tableName.length > 0 ? tableName : "NULL");
+      if (set[i].length > 0) {
+        query.push("SET");
+        query.push(set[i].join(", "));
+      }
+      if (where[i].length > 0) {
+        query.push("WHERE");
+        query.push(where[i].join(" AND "));
+      }
+
+      sql.push(query.join(" "));
+    }
+
+    setSql(sql.join(";\n") + ";");
+  }
+
+  function generateInsert() {
     let colunas = [];
     let values = Array.from({ length: commonLength }, () => {
       return new Array(fields.length);
@@ -136,7 +181,7 @@ export default function App() {
     fields.forEach((field, fieldIndex) => {
       const dados = [...field.dados];
       dados.length = commonLength;
-      colunas.push(field.nome.trim().length > 0 ? field.nome : "NULL");
+      colunas.push(field.nome.trim().length > 0 ? field.nome.trim() : "NULL");
       dados.forEach((dado, index) => {
         values[index][fieldIndex] =
           dado === undefined || dado === null || dado.trim().length === 0
@@ -147,15 +192,25 @@ export default function App() {
       });
     });
 
-    const values_str = values.map((value) => "(" + value.join(",") + ")");
+    const values_str = values.map((value) => "(" + value.join(", ") + ")");
 
     let sql = ["INSERT INTO"];
     sql.push(tableName.length > 0 ? tableName : "NULL");
-    sql.push("(" + colunas.join(",") + ")");
+    sql.push("(" + colunas.join(", ") + ")");
     sql.push("VALUES");
-    sql.push(values_str.join(","));
+    sql.push(values_str.join(", "));
 
     setSql(sql.join(" ") + ";");
+  }
+
+  function generateSql() {
+    switch (tipoQuery) {
+      case "UPDATE":
+        generateUpdate();
+        break;
+      default:
+        generateInsert();
+    }
   }
 
   const setMostCommon = () => {
@@ -207,6 +262,7 @@ export default function App() {
         dados: dados,
         id: crypto.randomUUID(),
         isNumerico: true,
+        isCondicao: false,
       },
     ]);
   };
@@ -232,6 +288,12 @@ export default function App() {
   const handleChangeType = (field, fieldIndex) => {
     const fields_ = [...fields];
     fields_[fieldIndex].isNumerico = !fields_[fieldIndex].isNumerico;
+    setFields(fields_);
+  };
+
+  const handleChangeIsCondicao = (field, fieldIndex) => {
+    const fields_ = [...fields];
+    fields_[fieldIndex].isCondicao = !fields_[fieldIndex].isCondicao;
     setFields(fields_);
   };
 
@@ -377,9 +439,8 @@ export default function App() {
             return (
               <Field
                 key={field.id}
-                nome={field.nome}
-                dados={field.dados}
-                isNumerico={field.isNumerico}
+                field={field}
+                condicaoDisabled={tipoQuery !== "UPDATE"}
                 onDelete={() => {
                   handleDeleteField(field, idx);
                 }}
@@ -401,6 +462,9 @@ export default function App() {
                 onChangeType={() => {
                   handleChangeType(field, idx);
                 }}
+                onChangeIsCondicao={() => {
+                  handleChangeIsCondicao(field, idx);
+                }}
                 isDifferent={
                   commonLength && field.dados.length !== commonLength
                 }
@@ -416,15 +480,56 @@ export default function App() {
             {plus}
           </button>
         </div>
-        <button
-          className="btn btn-primary mb-2 mt-2"
-          disabled={fields.length === 0}
-          onClick={() => {
-            generateSql();
-          }}
-        >
-          Gerar SQL
-        </button>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div class="dropdown primary">
+            <button
+              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+              class="btn btn-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {tipoQuery}
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button
+                  class="dropdown-item"
+                  onClick={() => {
+                    setTipoQuery("INSERT");
+                  }}
+                >
+                  INSERT
+                </button>
+              </li>
+              <li>
+                <button
+                  class="dropdown-item"
+                  type="button"
+                  onClick={() => {
+                    setTipoQuery("UPDATE");
+                  }}
+                >
+                  UPDATE
+                </button>
+              </li>
+            </ul>
+          </div>
+          <button
+            style={{
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              width: "100%",
+            }}
+            className="btn btn-primary mb-2 mt-2 "
+            disabled={fields.length === 0}
+            onClick={() => {
+              generateSql();
+            }}
+          >
+            Gerar SQL
+          </button>
+        </div>
         <div
           title="Copiar"
           className="card result "
@@ -443,7 +548,7 @@ export default function App() {
             }
           }}
         >
-          <a>{sql}</a>
+          <p style={{ width: "100%" }}>{sql}</p>
         </div>
       </div>
       <div

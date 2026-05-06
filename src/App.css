@@ -29,6 +29,7 @@
   overflow-y: auto !important;
   margin: 5px 0px 0px 0px !important;
   flex-shrink: 1;
+  height: 100%;
 }
 
 .fieldHeader {

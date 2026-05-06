@@ -18,11 +18,10 @@ import "./Field.css";
 
 function Field(props) {
   const {
-    nome,
-    dados,
-    isNumerico,
+    field,
     onDelete,
-    deleteDisabled,
+    condicaoDisabled,
+    onChangeIsCondicao,
     onChangeName,
     onChangeDado,
     onDeleteDado,
@@ -36,7 +35,27 @@ function Field(props) {
   return (
     <div className={`field card w-100 ${isDifferent ? "bg-warning" : ""}`}>
       <div className="fieldHeader">
-        <a style={{ fontSize: 20, marginRight: 5 }}>({dados.length})</a>
+        <div
+          class="form-check form-check-inline me-2 p-0"
+          hidden={condicaoDisabled}
+        >
+          <input
+            type="checkbox"
+            class="btn-check"
+            id={`btn-check-outlined${field.id}`}
+            autocomplete="off"
+            defaultValue={field.isCondicao}
+            onClick={() => {
+              onChangeIsCondicao();
+            }}
+          />
+          <label
+            class="btn btn-outline-primary"
+            for={`btn-check-outlined${field.id}`}
+          >
+            Condição
+          </label>
+        </div>
         <div className="input-group">
           <button
             className="btn btn-outline-primary"
@@ -44,30 +63,30 @@ function Field(props) {
             style={{ justifyContent: "center" }}
             onClick={() => onChangeType()}
           >
-            {isNumerico ? number : alphabet}
+            {field.isNumerico ? number : alphabet}
           </button>
 
           <input
             placeholder="Nome do campo"
-            defaultValue={nome}
+            defaultValue={field.nome}
             className="form-control"
             style={{ marginRight: "10px" }}
             onBlur={(e) => onChangeName(e.target.value)}
           ></input>
         </div>
         <button
-          disabled={deleteDisabled}
-          className="btn btn-danger col-4"
+          className="btn btn-danger col-3 me-2"
           onClick={() => {
             onDelete();
           }}
         >
           Remover
         </button>
+        <a style={{ fontSize: 20, marginRight: 5 }}>({field.dados.length})</a>
       </div>
       <div className="info" hidden={!isVisible}>
         <div>
-          {dados.map((dado, index) => {
+          {field.dados.map((dado, index) => {
             return (
               <div className="infoContent" key={crypto.randomUUID()}>
                 <div className="col-1">
@@ -118,7 +137,7 @@ function Field(props) {
                     {plus} {arrow_down}
                   </button>
                   <button
-                    disabled={dados.length <= 1}
+                    disabled={field.dados.length <= 1}
                     title="Excluir"
                     className="btn btn-danger infoButton"
                     onClick={() => {
