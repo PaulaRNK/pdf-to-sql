@@ -142,7 +142,7 @@ export default function App() {
           dado === undefined || dado === null || dado.trim().length === 0
             ? "NULL"
             : field.isNumerico
-              ? Number(dado)
+              ? Number(dado.replace(",", "."))
               : "'" + String(dado).replace(/'/g, "''") + "'";
       });
     });
