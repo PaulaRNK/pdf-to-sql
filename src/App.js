@@ -198,6 +198,19 @@ export default function App() {
     setFields(fields_);
   };
 
+  const handleAddCampo = () => {
+    const dados = Array.from({ length: commonLength ?? 1 }, () => "");
+    setFields([
+      ...fields,
+      {
+        nome: "",
+        dados: dados,
+        id: crypto.randomUUID(),
+        isNumerico: true,
+      },
+    ]);
+  };
+
   const handleDeleteDado = (field, fieldIndex, index) => {
     const fields_ = [...fields];
     fields_[fieldIndex].dados.splice(index, 1);
@@ -364,7 +377,6 @@ export default function App() {
             return (
               <Field
                 key={field.id}
-                deleteDisabled={fields.length <= 1}
                 nome={field.nome}
                 dados={field.dados}
                 isNumerico={field.isNumerico}
@@ -396,18 +408,9 @@ export default function App() {
             );
           })}
           <button
-            hidden={fields.length === 0}
             className="btn btn-success mt-2 "
             onClick={() => {
-              setFields([
-                ...fields,
-                {
-                  nome: "",
-                  dados: [""],
-                  id: crypto.randomUUID(),
-                  isNumerico: true,
-                },
-              ]);
+              handleAddCampo();
             }}
           >
             {plus}
